@@ -1,0 +1,51 @@
+# Gradle
+.gradle/
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
+*.hprof
+gradle-app.setting
+.gradletasknamecache
+
+# Android
+*.apk
+*.ap_
+*.aab
+*.dex
+local.properties
+/captures
+.externalNativeBuild
+.cxx
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Kotlin
+*.kt.swp
+.kotlin/
+
+# macOS
+.DS_Store
+
+# iOS/Xcode
+*.xcuserstate
+*.xcscheme
+xcschememanagement.plist
+*.xcbkptlist
+xcuserdata/
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+timeline.xctimeline
+playground.xcworkspace
+Pods/
+*.moved-aside
+.swiftpm/
+
+# Log files
+*.log

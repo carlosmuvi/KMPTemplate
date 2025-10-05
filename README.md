@@ -1,0 +1,183 @@
+# Kotlin Multiplatform Template
+
+A minimal Kotlin Multiplatform project template with essential architecture components for building cross-platform mobile applications.
+
+## Features
+
+This template includes:
+
+- ✅ **Kotlin Multiplatform** - Share business logic between iOS and Android
+- ✅ **Koin** - Dependency injection for all platforms
+- ✅ **ViewModel** - Lifecycle-aware state management
+- ✅ **Jetpack Compose** - Modern UI framework for Android
+- ✅ **SwiftUI** - Native UI framework for iOS
+- ✅ **SKIE** - Swift-friendly Kotlin API generation
+
+## Project Structure
+
+```
+.
+├── common/                 # Shared Kotlin code
+│   ├── src/
+│   │   ├── commonMain/    # Platform-agnostic code
+│   │   ├── androidMain/   # Android-specific code
+│   │   ├── iosMain/       # iOS-specific code
+│   │   └── jvmMain/       # JVM-specific code
+├── app/                   # Android application
+└── ios/                   # iOS application (Xcode project)
+```
+
+## Getting Started
+
+### Prerequisites
+
+- **Android Development:**
+  - Android Studio (latest version)
+  - JDK 17+
+
+- **iOS Development:**
+  - Xcode 15+
+  - macOS
+
+### Running the Project
+
+#### Android
+
+1. Open the project in Android Studio
+2. Wait for Gradle sync to complete
+3. Run the `app` configuration
+
+#### iOS
+
+1. Open `ios/KMPTemplate/KMPTemplate.xcodeproj` in Xcode
+2. Select your target device/simulator
+3. Build and run (⌘R)
+
+## Architecture
+
+### Shared Module (`common`)
+
+The shared module contains:
+
+- **ViewModels** - Business logic and state management
+- **Koin Modules** - Dependency injection configuration
+- **Platform-specific implementations** - Using `expect`/`actual` mechanism
+
+### Android App
+
+- Uses Jetpack Compose for UI
+- Integrates with Koin for dependency injection
+- ViewModels are accessed via `koinViewModel()` composable
+
+### iOS App
+
+- Uses SwiftUI for UI
+- Koin integration through the shared framework
+- ViewModels are accessed through `IOSViewModelStoreOwner`
+
+## Adding Features
+
+### 1. Create a ViewModel
+
+In `common/src/commonMain/kotlin/.../viewmodel/`:
+
+```kotlin
+class MyViewModel : ViewModel(), KoinComponent {
+    private val _state = MutableStateFlow<MyState>(MyState.Loading)
+    val state: StateFlow<MyState> = _state.asStateFlow()
+
+    // Your business logic here
+}
+```
+
+### 2. Register in Koin
+
+In `common/src/commonMain/kotlin/.../di/ViewModelModule.kt`:
+
+```kotlin
+val viewModelModule = module {
+    viewModelOf(::MainViewModel)
+    viewModelOf(::MyViewModel)  // Add your ViewModel here
+}
+```
+
+### 3. Use in Android (Compose)
+
+```kotlin
+@Composable
+fun MyScreen(
+    viewModel: MyViewModel = koinViewModel()
+) {
+    val state by viewModel.state.collectAsState()
+
+    // Your UI code
+}
+```
+
+### 4. Use in iOS (SwiftUI)
+
+```swift
+struct MyView: View {
+    @StateObject var viewModelStoreOwner = IOSViewModelStoreOwner()
+
+    var body: some View {
+        let viewModel: MyViewModel = viewModelStoreOwner.viewModel()
+
+        Observing(viewModel.state) { state in
+            // Your UI code
+        }
+    }
+}
+```
+
+## Adding Dependencies
+
+### Shared Dependencies
+
+Add to `common/build.gradle.kts`:
+
+```kotlin
+commonMain.dependencies {
+    implementation("your.dependency:artifact:version")
+}
+```
+
+### Platform-Specific Dependencies
+
+```kotlin
+androidMain.dependencies {
+    implementation("android.specific:dependency:version")
+}
+
+iosMain.dependencies {
+    implementation("ios.specific:dependency:version")
+}
+```
+
+## Customization
+
+### Renaming the Project
+
+1. Update `rootProject.name` in `settings.gradle.kts`
+2. Update iOS project name in Xcode
+3. Update package names throughout the project
+4. Update `applicationId` in `app/build.gradle.kts`
+5. Update `namespace` in both module build files
+6. Update the framework `baseName` in `common/build.gradle.kts`
+
+### Changing the Theme
+
+- **Android**: Edit `app/src/main/java/.../presentation/global/Theme.kt`
+- **iOS**: Modify SwiftUI views directly or add a custom theme
+
+## Additional Resources
+
+- [Kotlin Multiplatform Documentation](https://kotlinlang.org/docs/multiplatform.html)
+- [Koin Documentation](https://insert-koin.io/)
+- [Jetpack Compose Documentation](https://developer.android.com/jetpack/compose)
+- [SwiftUI Documentation](https://developer.apple.com/documentation/swiftui)
+- [SKIE Documentation](https://skie.touchlab.co/)
+
+## License
+
+This template is available for use in your own projects.
