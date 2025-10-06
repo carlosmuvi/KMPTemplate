@@ -11,8 +11,7 @@ data class Event(
     val location: String? = null,
     val startDateTime: LocalDateTime,
     val endDateTime: LocalDateTime,
-    val allDay: Boolean = false,
-    val reminder: ReminderTime? = null
+    val allDay: Boolean = false
 )
 
 enum class ReminderTime(val minutes: Int) {

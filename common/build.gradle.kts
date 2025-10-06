@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.skie)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
@@ -48,6 +49,8 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines)
             api(libs.kotlinx.datetime)
+            implementation(libs.kotlinx.serialization)
+            implementation(libs.kotlinx.serialization.json)
 
             api(libs.koin.core)
             implementation(libs.koin.compose)

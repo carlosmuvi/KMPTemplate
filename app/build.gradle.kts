@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling)
 
     implementation(libs.androidx.compose.material3)
+    implementation("androidx.compose.material:material-icons-extended")
 
     implementation(libs.androidx.lifecycle.compose)
 
@@ -77,6 +78,9 @@ dependencies {
     implementation(libs.koin.androidx.compose)
 
     implementation(libs.kermit)
+
+    // Gemini Nano on-device AI via AICore
+    implementation(libs.aicore)
 
     testImplementation(libs.junit)
     testImplementation(libs.koin.test)

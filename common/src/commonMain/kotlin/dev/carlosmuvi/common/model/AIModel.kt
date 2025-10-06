@@ -37,6 +37,7 @@ interface AIModel {
      * Run inference on the model with the given prompt
      * @param prompt The input text to process
      * @return The model's response
+     * @throws Exception if model execution fails
      */
-    suspend fun run(prompt: String): Result<AIModelResponse>
+    suspend fun run(prompt: String): AIModelResponse
 }

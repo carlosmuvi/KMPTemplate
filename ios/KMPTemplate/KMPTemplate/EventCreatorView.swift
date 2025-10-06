@@ -25,18 +25,22 @@ struct EventCreatorView: View {
                 Text("Event Details")
                     .font(.headline)
 
-                TextEditor(text: $inputText)
-                    .frame(height: 120)
-                    .padding(8)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color(.systemGray4), lineWidth: 1)
-                    )
-                    .onChange(of: inputText) { _, newValue in
-                        viewModel.updateInputText(text: newValue)
-                    }
+                if #available(iOS 17.0, *) {
+                    TextEditor(text: $inputText)
+                        .frame(height: 120)
+                        .padding(8)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(8)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color(.systemGray4), lineWidth: 1)
+                        )
+                        .onChange(of: inputText) {
+                            viewModel.updateInputText(text: inputText)
+                        }
+                } else {
+                    // Fallback on earlier versions
+                }
             }
             .padding(.horizontal)
 
@@ -170,14 +174,6 @@ struct EventCardView: View {
 
                 if event.allDay {
                     EventDetailRow(icon: "sun.max", title: "All Day", value: "Yes")
-                }
-
-                if let reminder = event.reminder {
-                    EventDetailRow(
-                        icon: "bell",
-                        title: "Reminder",
-                        value: formatReminder(reminder)
-                    )
                 }
             }
         }
