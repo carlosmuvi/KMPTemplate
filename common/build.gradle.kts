@@ -32,6 +32,7 @@ kotlin {
     ).forEach {
         it.binaries.framework {
             export(libs.androidx.lifecycle.viewmodel)
+            export(libs.kotlinx.datetime)
             baseName = "KMPTemplateKit"
         }
     }
@@ -46,6 +47,7 @@ kotlin {
 
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines)
+            api(libs.kotlinx.datetime)
 
             api(libs.koin.core)
             implementation(libs.koin.compose)

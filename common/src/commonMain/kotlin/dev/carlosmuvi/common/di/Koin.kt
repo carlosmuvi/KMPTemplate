@@ -17,6 +17,7 @@ fun initKoin() = initKoin(appDeclaration = {})
 fun commonModule() = module {
     // Add your dependencies here
 
+    includes(repositoryModule)
     includes(viewModelModule)
     includes(platformModule())
 }
