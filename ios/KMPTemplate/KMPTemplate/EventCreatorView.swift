@@ -48,14 +48,14 @@ struct EventCreatorView: View {
             Button(action: {
                 viewModel.parseEvent()
             }) {
-                Observing(viewModel.eventState) { state in
+                Observing(viewModel.state) { state in
                     HStack {
-                        if state is UiStateLoading {
+                        if state.isLoading {
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle(tint: .white))
                                 .scaleEffect(0.8)
                         }
-                        Text(state is UiStateLoading ? "Parsing..." : "Parse Event")
+                        Text(state.isLoading ? "Parsing..." : "Parse Event")
                             .fontWeight(.semibold)
                     }
                     .frame(maxWidth: .infinity)
@@ -69,43 +69,33 @@ struct EventCreatorView: View {
             .padding(.horizontal)
 
             // Event State Display
-            Observing(viewModel.eventState) { state in
+            Observing(viewModel.state) { state in
                 VStack(spacing: 16) {
-                    if let successState = state as? UiStateSuccess<Event> {
-                        EventCardView(event: successState.data!)
-
-                        Button(action: {
-                            viewModel.confirmEvent()
-                        }) {
-                            Text("Add to Calendar")
-                                .fontWeight(.semibold)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.green)
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
-                        }
-                        .padding(.horizontal)
-                    } else if let errorState = state as? UiStateError {
+                    // Error Display
+                    if let error = state.error {
                         VStack(spacing: 12) {
                             Image(systemName: "exclamationmark.triangle.fill")
-                                .font(.system(size: 40))
+                                .font(.system(size: state.event == nil ? 40 : 24))
                                 .foregroundColor(.red)
 
-                            Text("Error")
+                            Text(state.event == nil ? "Parsing Error" : "Calendar Error")
                                 .font(.headline)
                                 .foregroundColor(.red)
 
-                            Text(errorState.message)
+                            Text(error)
                                 .font(.body)
                                 .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal)
 
                             Button(action: {
-                                viewModel.resetState()
+                                if state.event != nil {
+                                    viewModel.confirmEvent()
+                                } else {
+                                    viewModel.resetState()
+                                }
                             }) {
-                                Text("Try Again")
+                                Text(state.event != nil ? "Retry" : "Try Again")
                                     .fontWeight(.semibold)
                                     .padding(.horizontal, 32)
                                     .padding(.vertical, 12)
@@ -115,8 +105,50 @@ struct EventCreatorView: View {
                             }
                         }
                         .padding()
-                        .background(Color(.systemGray6))
+                        .background(state.event == nil ? Color(.systemGray6) : Color.red.opacity(0.1))
                         .cornerRadius(12)
+                        .padding(.horizontal)
+                    }
+
+                    // Event Display
+                    if let event = state.event {
+                        EventCardView(event: event)
+
+                        Button(action: {
+                            viewModel.confirmEvent()
+                        }) {
+                            HStack {
+                                if state.isAddingToCalendar {
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                        .scaleEffect(0.8)
+                                }
+                                Text(state.isAddingToCalendar ? "Adding to Calendar..." : "Add to Calendar")
+                                    .fontWeight(.semibold)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(state.isAddingToCalendar ? Color.gray : Color.green)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                        }
+                        .disabled(state.isAddingToCalendar)
+                        .padding(.horizontal)
+                    }
+
+                    // Success Message
+                    if let successMessage = state.successMessage {
+                        HStack {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                            Text(successMessage)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.green)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.green.opacity(0.1))
+                        .cornerRadius(10)
                         .padding(.horizontal)
                     }
                 }
@@ -184,7 +216,7 @@ struct EventCardView: View {
     }
 
     private func formatDateTime(_ dateTime: LocalDateTime) -> String {
-        return "\(dateTime.year)-\(String(format: "%02d", dateTime.monthNumber))-\(String(format: "%02d", dateTime.dayOfMonth)) at \(String(format: "%02d", dateTime.hour)):\(String(format: "%02d", dateTime.minute))"
+        return "\(dateTime.year)-\(String(format: "%02d", dateTime.month.number))-\(String(format: "%02d", dateTime.day)) at \(String(format: "%02d", dateTime.hour)):\(String(format: "%02d", dateTime.minute))"
     }
 
     private func formatReminder(_ reminder: ReminderTime) -> String {

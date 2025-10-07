@@ -5,11 +5,15 @@ import KMPTemplateKit
 struct KMPTemplateApp: App {
     init() {
         // Pass the AI models to Koin
+        let aiModels: [AIModel]
         if #available(iOS 26.0, *) {
-            KoinKt.doInitKoin(aiModels: [AppleFoundationModel()])
+            aiModels = [AppleFoundationModel()]
         } else {
-            KoinKt.doInitKoin(aiModels: [])
+            aiModels = []
         }
+
+        // Initialize Koin with AI models
+        KoinKt.doInitKoin(aiModels: aiModels)
     }
 
     var body: some Scene {

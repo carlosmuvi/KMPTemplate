@@ -17,7 +17,6 @@
 		2D9F54F52E282D2900B2749E /* IOSViewModelStoreOwner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D9F54F42E282D2200B2749E /* IOSViewModelStoreOwner.swift */; };
 		2D9F54F72E282D2900B2749E /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D9F54F62E282D2200B2749E /* MainView.swift */; };
 		3E1A2B3C2F3E4A5D00C1234A /* EventCreatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E1A2B3B2F3E4A5D00C1234A /* EventCreatorView.swift */; };
-		3E1A2B3E2F3E4A6E00C1234B /* SwiftLanguageModelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E1A2B3D2F3E4A6E00C1234B /* SwiftLanguageModelProvider.swift */; };
 		3E1A2B3F2F3E4A7F00C1234C /* AppleFoundationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E1A2B3E2F3E4A7F00C1234C /* AppleFoundationModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -32,7 +31,6 @@
 		2D9F54F42E282D2200B2749E /* IOSViewModelStoreOwner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSViewModelStoreOwner.swift; sourceTree = "<group>"; };
 		2D9F54F62E282D2200B2749E /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		3E1A2B3B2F3E4A5D00C1234A /* EventCreatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCreatorView.swift; sourceTree = "<group>"; };
-		3E1A2B3D2F3E4A6E00C1234B /* SwiftLanguageModelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftLanguageModelProvider.swift; sourceTree = "<group>"; };
 		3E1A2B3E2F3E4A7F00C1234C /* AppleFoundationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleFoundationModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -72,7 +70,6 @@
 				1A0F7AE325C5C96F00EB34CF /* ContentView.swift */,
 				2D9F54F62E282D2200B2749E /* MainView.swift */,
 				3E1A2B3B2F3E4A5D00C1234A /* EventCreatorView.swift */,
-				3E1A2B3D2F3E4A6E00C1234B /* SwiftLanguageModelProvider.swift */,
 				3E1A2B3E2F3E4A7F00C1234C /* AppleFoundationModel.swift */,
 				1A0F7AE525C5C97000EB34CF /* Assets.xcassets */,
 				1A0F7AEA25C5C97000EB34CF /* Info.plist */,
@@ -195,8 +192,8 @@
 				1A0F7AE425C5C96F00EB34CF /* ContentView.swift in Sources */,
 				1A0F7AE225C5C96F00EB34CF /* KMPTemplateApp.swift in Sources */,
 				3E1A2B3C2F3E4A5D00C1234A /* EventCreatorView.swift in Sources */,
-				3E1A2B3E2F3E4A6E00C1234B /* SwiftLanguageModelProvider.swift in Sources */,
 				3E1A2B3F2F3E4A7F00C1234C /* AppleFoundationModel.swift in Sources */,
+				3E1A2B412F3E4AA100C1234E /* IOSCalendarManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

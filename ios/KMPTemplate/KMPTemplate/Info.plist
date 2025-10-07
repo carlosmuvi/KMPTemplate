@@ -30,6 +30,10 @@
 	<true/>
 	<key>UILaunchScreen</key>
 	<dict/>
+	<key>NSCalendarsUsageDescription</key>
+	<string>This app needs access to your calendar to add events that you create.</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>This app needs full access to your calendar to add events that you create.</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>

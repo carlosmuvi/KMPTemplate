@@ -1,10 +1,14 @@
+@file:OptIn(ExperimentalTime::class)
+
 package dev.carlosmuvi.common.repository
 
+import dev.carlosmuvi.common.model.AIInstructions
 import dev.carlosmuvi.common.model.Event
-import dev.carlosmuvi.common.model.ReminderTime
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 /**
  * Repository that parses natural language text into Event objects.
@@ -54,18 +58,15 @@ class AIEventParserRepository(
     }
 
     private fun buildEventExtractionPrompt(text: String): String {
+        // Get current date and time as string
+        val currentDateTime = Clock.System.now().toString()
         return """
-            Extract event information from the following text and return a JSON object with these fields:
-            - title: The event title (required)
-            - description: Additional details (optional)
-            - location: Event location (optional)
-            - startDateTime: ISO format YYYY-MM-DDTHH:MM (required)
-            - endDateTime: ISO format YYYY-MM-DDTHH:MM (required)
-            - allDay: boolean (required)
+            ${AIInstructions.eventExtraction}
 
-            Text: $text
+            Current date and time: $currentDateTime
+            Use this as reference when interpreting relative dates like "today", "tomorrow", "tonight", etc.
 
-            Return only the JSON object, no additional text.
+            Text to parse: $text
         """.trimIndent()
     }
 

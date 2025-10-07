@@ -7,7 +7,7 @@ import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 
 fun initKoin(
-    aiModels: List<AIModel> = emptyList(),
+    aiModels: List<AIModel>,
     appDeclaration: KoinAppDeclaration = {}
 ) =
     startKoin {
@@ -19,9 +19,9 @@ fun initKoin(
 fun initKoin(aiModels: List<AIModel>) =
     initKoin(aiModels, appDeclaration = {})
 
-fun commonModule(aiModels: List<AIModel> = emptyList()) = module {
-    // Add your dependencies here
-
+fun commonModule(
+    aiModels: List<AIModel> = emptyList()
+) = module {
     // Register the list of AI models
     single { aiModels }
 

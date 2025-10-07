@@ -1,6 +1,15 @@
 package dev.carlosmuvi.kmptemplate.ui
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -12,24 +21,40 @@ import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material.icons.filled.WbSunny
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.carlosmuvi.common.model.Event
+import dev.carlosmuvi.common.model.EventCreatorState
 import dev.carlosmuvi.common.model.ReminderTime
-import dev.carlosmuvi.common.model.UiState
 import dev.carlosmuvi.common.viewmodel.EventCreatorViewModel
+import kotlinx.datetime.LocalDateTime
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EventCreatorScreen(
     viewModel: EventCreatorViewModel = koinViewModel()
 ) {
-    val eventState by viewModel.eventState.collectAsState()
-    var inputText by remember { mutableStateOf("") }
+    val state: EventCreatorState by viewModel.state.collectAsState()
+    var inputText: String by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -81,10 +106,10 @@ fun EventCreatorScreen(
         // Parse Button
         Button(
             onClick = { viewModel.parseEvent() },
-            enabled = inputText.isNotBlank() && eventState !is UiState.Loading,
+            enabled = inputText.isNotBlank() && !state.isLoading,
             modifier = Modifier.fillMaxWidth()
         ) {
-            if (eventState is UiState.Loading) {
+            if (state.isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(20.dp),
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -97,30 +122,77 @@ fun EventCreatorScreen(
             }
         }
 
-        // Event State Display
-        when (val state = eventState) {
-            is UiState.Success -> {
-                EventCard(event = state.data)
+        // Error Display
+        state.error?.let { error ->
+            ErrorCard(
+                title = if (state.event != null) "Calendar Error" else "Parsing Error",
+                message = error,
+                onRetry = {
+                    if (state.event != null) {
+                        viewModel.confirmEvent()
+                    } else {
+                        viewModel.resetState()
+                    }
+                },
+                retryButtonText = if (state.event != null) "Retry" else "Try Again"
+            )
+        }
 
-                Button(
-                    onClick = { viewModel.confirmEvent() },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.tertiary
+        // Event Display
+        state.event?.let { event ->
+            EventCard(event = event)
+
+            Button(
+                onClick = { viewModel.confirmEvent() },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !state.isAddingToCalendar,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary
+                )
+            ) {
+                if (state.isAddingToCalendar) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
                     )
-                ) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Adding to Calendar...")
+                } else {
                     Text("Add to Calendar")
                 }
             }
+        }
 
-            is UiState.Error -> {
-                ErrorCard(
-                    message = state.message,
-                    onRetry = { viewModel.resetState() }
+        // Success Message
+        state.successMessage?.let { message ->
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
                 )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.tertiary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                }
             }
-
-            else -> {}
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -218,7 +290,7 @@ fun EventCard(event: Event) {
 
 @Composable
 fun EventDetailRow(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     label: String,
     value: String
 ) {
@@ -250,7 +322,12 @@ fun EventDetailRow(
 }
 
 @Composable
-fun ErrorCard(message: String, onRetry: () -> Unit) {
+fun ErrorCard(
+    title: String = "Error",
+    message: String,
+    onRetry: () -> Unit,
+    retryButtonText: String = "Try Again"
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -270,7 +347,7 @@ fun ErrorCard(message: String, onRetry: () -> Unit) {
             )
 
             Text(
-                text = "Error",
+                text = title,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.error,
                 fontWeight = FontWeight.SemiBold
@@ -288,13 +365,13 @@ fun ErrorCard(message: String, onRetry: () -> Unit) {
                     containerColor = MaterialTheme.colorScheme.error
                 )
             ) {
-                Text("Try Again")
+                Text(retryButtonText)
             }
         }
     }
 }
 
-private fun formatDateTime(dateTime: kotlinx.datetime.LocalDateTime): String {
+private fun formatDateTime(dateTime: LocalDateTime): String {
     return "${dateTime.year}-${dateTime.monthNumber.toString().padStart(2, '0')}-${
         dateTime.dayOfMonth.toString().padStart(2, '0')
     } at ${dateTime.hour.toString().padStart(2, '0')}:${
