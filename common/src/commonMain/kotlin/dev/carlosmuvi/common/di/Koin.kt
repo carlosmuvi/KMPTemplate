@@ -1,22 +1,31 @@
 package dev.carlosmuvi.common.di
 
+import dev.carlosmuvi.common.model.AIModel
 import dev.carlosmuvi.common.platformModule
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 
-fun initKoin(appDeclaration: KoinAppDeclaration = {}) =
+fun initKoin(
+    aiModels: List<AIModel>,
+    appDeclaration: KoinAppDeclaration = {}
+) =
     startKoin {
         appDeclaration()
-        modules(commonModule())
+        modules(commonModule(aiModels))
     }
 
 // called by iOS etc
-fun initKoin() = initKoin(appDeclaration = {})
+fun initKoin(aiModels: List<AIModel>) =
+    initKoin(aiModels, appDeclaration = {})
 
-fun commonModule() = module {
-    // Add your dependencies here
+fun commonModule(
+    aiModels: List<AIModel> = emptyList()
+) = module {
+    // Register the list of AI models
+    single { aiModels }
 
+    includes(repositoryModule)
     includes(viewModelModule)
     includes(platformModule())
 }
