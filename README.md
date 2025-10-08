@@ -170,6 +170,115 @@ iosMain.dependencies {
 - **Android**: Edit `app/src/main/java/.../presentation/global/Theme.kt`
 - **iOS**: Modify SwiftUI views directly or add a custom theme
 
+## Using Swift Dependencies in Kotlin Multiplatform
+
+This template includes a **SwiftLibDependencyFactory** pattern for integrating Swift-only dependencies (like Swift Package Manager libraries) into your Kotlin Multiplatform code.
+
+### Why Use This Pattern?
+
+Use this when you need to integrate:
+- Firebase Analytics (when CocoaPods integration isn't available)
+- Native iOS SDKs that don't expose Objective-C headers
+- Swift Package Manager dependencies
+- Any Swift-only library
+
+### How It Works
+
+1. **Define a Kotlin interface** in `commonMain` for your dependency
+2. **Add a factory method** in `SwiftLibDependencyFactory.kt` (in `iosMain`)
+3. **Implement in Swift** in `SwiftLibDependencyFactoryImpl.swift` (iOS app)
+4. **Register with Koin** in `SwiftLibDependenciesModule.kt`
+5. **Use anywhere** in your Kotlin code via dependency injection
+
+### Example: Adding Firebase Analytics
+
+#### Step 1: Create Kotlin Interface
+
+In `common/src/commonMain/kotlin`:
+
+```kotlin
+interface Analytics {
+    fun logEvent(event: String, params: Map<String, Any>?)
+}
+```
+
+#### Step 2: Add Factory Method
+
+In `common/src/iosMain/kotlin/.../di/SwiftLibDependencyFactory.kt`:
+
+```kotlin
+interface SwiftLibDependencyFactory {
+    fun providePlatformInfo(): PlatformInfo
+    fun provideAnalytics(): Analytics  // Add this
+}
+```
+
+#### Step 3: Implement in Swift
+
+In `ios/KMPTemplate/KMPTemplate/SwiftLibDependencyFactoryImpl.swift`:
+
+```swift
+import FirebaseAnalytics  // Add via Swift Package Manager
+
+class FirebaseAnalyticsImpl: Analytics {
+    func logEvent(event: String, params: [String : Any]?) {
+        var eventParams: [String: Any] = [:]
+        params?.forEach { key, value in eventParams[key] = "\(value)" }
+        Analytics.logEvent(event, parameters: eventParams)
+    }
+}
+
+// Add to factory:
+func provideAnalytics() -> any Analytics {
+    return FirebaseAnalyticsImpl()
+}
+```
+
+#### Step 4: Register in Koin
+
+In `common/src/iosMain/kotlin/.../di/SwiftLibDependenciesModule.kt`:
+
+```kotlin
+internal fun swiftLibDependenciesModule(factory: SwiftLibDependencyFactory): Module = module {
+    single<PlatformInfo> { factory.providePlatformInfo() }
+    single<Analytics> { factory.provideAnalytics() }  // Add this
+}
+```
+
+#### Step 5: Use in Your Code
+
+```kotlin
+class MyViewModel : ViewModel(), KoinComponent {
+    private val analytics: Analytics by inject()
+
+    fun trackEvent() {
+        analytics.logEvent("button_clicked", mapOf("screen" to "home"))
+    }
+}
+```
+
+### Current Example: PlatformInfo
+
+The template includes a working example:
+- **Interface**: `PlatformInfo` in `common/src/commonMain/kotlin/.../platform/`
+- **iOS Implementation**: Uses `UIDevice` to get iOS version (Swift-only API)
+- **Android Implementation**: Uses `Build.VERSION` for Android
+- **Usage**: See `MainViewModel.kt` for example
+
+### Benefits
+
+✅ **Type-safe**: Kotlin interfaces ensure compile-time safety
+✅ **Testable**: Easy to mock Swift dependencies in tests
+✅ **Centralized**: All Swift dependencies registered in one place
+✅ **Platform-agnostic**: Common code doesn't know about platform details
+✅ **Flexible**: Add new dependencies without changing architecture
+
+### Important Notes
+
+- The factory is a **singleton** (`shared`) in Swift
+- All Swift implementations must be **thread-safe**
+- After adding dependencies, rebuild: `./gradlew :common:embedAndSignAppleFrameworkForXcode`
+
 ## Additional Resources
 
 - [Kotlin Multiplatform Documentation](https://kotlinlang.org/docs/multiplatform.html)

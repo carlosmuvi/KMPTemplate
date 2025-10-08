@@ -16,6 +16,7 @@
 		2D9F54F02E27A02000B2749E /* ViewModelStoreOwnerProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D9F54EF2E27A02000B2749E /* ViewModelStoreOwnerProvider.swift */; };
 		2D9F54F52E282D2900B2749E /* IOSViewModelStoreOwner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D9F54F42E282D2200B2749E /* IOSViewModelStoreOwner.swift */; };
 		2D9F54F72E282D2900B2749E /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D9F54F62E282D2200B2749E /* MainView.swift */; };
+		3E1F8ABC2F38B03000C3840F /* SwiftLibDependencyFactoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E1F8ABB2F38B03000C3840F /* SwiftLibDependencyFactoryImpl.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		2D9F54EF2E27A02000B2749E /* ViewModelStoreOwnerProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModelStoreOwnerProvider.swift; sourceTree = "<group>"; };
 		2D9F54F42E282D2200B2749E /* IOSViewModelStoreOwner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSViewModelStoreOwner.swift; sourceTree = "<group>"; };
 		2D9F54F62E282D2200B2749E /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		3E1F8ABB2F38B03000C3840F /* SwiftLibDependencyFactoryImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftLibDependencyFactoryImpl.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +72,7 @@
 				1A0F7AE725C5C97000EB34CF /* Preview Content */,
 				2D9F54EF2E27A02000B2749E /* ViewModelStoreOwnerProvider.swift */,
 				2D9F54F42E282D2200B2749E /* IOSViewModelStoreOwner.swift */,
+				3E1F8ABB2F38B03000C3840F /* SwiftLibDependencyFactoryImpl.swift */,
 			);
 			path = KMPTemplate;
 			sourceTree = "<group>";
@@ -185,6 +188,7 @@
 				2D9F54F72E282D2900B2749E /* MainView.swift in Sources */,
 				1A0F7AE425C5C96F00EB34CF /* ContentView.swift in Sources */,
 				1A0F7AE225C5C96F00EB34CF /* KMPTemplateApp.swift in Sources */,
+				3E1F8ABC2F38B03000C3840F /* SwiftLibDependencyFactoryImpl.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
