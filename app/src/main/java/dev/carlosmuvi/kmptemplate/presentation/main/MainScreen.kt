@@ -17,6 +17,7 @@ fun MainScreen(
 ) {
     val counter by viewModel.counter.collectAsState()
     val message by viewModel.message.collectAsState()
+    val platformDetails by viewModel.platformDetails.collectAsState()
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -32,7 +33,14 @@ fun MainScreen(
             Text(
                 text = message,
                 style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(bottom = 32.dp)
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Text(
+                text = platformDetails,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 24.dp)
             )
 
             Text(

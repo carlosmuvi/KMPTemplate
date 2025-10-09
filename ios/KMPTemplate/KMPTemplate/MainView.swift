@@ -15,6 +15,13 @@ struct MainView: View {
                     .padding()
             }
 
+            Observing(viewModel.platformDetails) { platformDetails in
+                Text(platformDetails)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .padding(.bottom, 8)
+            }
+
             Observing(viewModel.counter) { counter in
                 Text("Counter: \(counter)")
                     .font(.system(size: 48, weight: .bold))
