@@ -4,7 +4,12 @@ import KMPTemplateKit
 @main
 struct KMPTemplateApp: App {
     init() {
-        KoinKt.doInitKoin()
+        // Initialize Koin with Swift dependency factory
+        KoinKt.doInitKoin { koinApp in
+            koinApp.provideSwiftLibDependencyFactory(
+                factory: SwiftLibDependencyFactoryImpl.shared
+            )
+        }
     }
     var body: some Scene {
         WindowGroup {

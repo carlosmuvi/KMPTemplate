@@ -170,6 +170,32 @@ iosMain.dependencies {
 - **Android**: Edit `app/src/main/java/.../presentation/global/Theme.kt`
 - **iOS**: Modify SwiftUI views directly or add a custom theme
 
+## Using Swift Dependencies in Kotlin Multiplatform
+
+This template includes a **SwiftLibDependencyFactory** pattern for integrating Swift-only dependencies (like Swift Package Manager libraries) into your Kotlin Multiplatform code.
+
+### Why Use This Pattern?
+
+Use this when you need to integrate:
+- Firebase Analytics (when CocoaPods integration isn't available)
+- Native iOS SDKs that don't expose Objective-C headers
+- Swift Package Manager dependencies
+- Any Swift-only library
+
+### How It Works
+
+1. **Define a Kotlin interface** in `commonMain` for your dependency
+2. **Add a factory method** in `SwiftLibDependencyFactory.kt` (in `iosMain`)
+3. **Implement in Swift** in `SwiftLibDependencyFactoryImpl.swift` (iOS app)
+4. **Register with Koin** in `SwiftLibDependenciesModule.kt`
+5. **Use anywhere** in your Kotlin code via dependency injection
+
+### Important Notes
+
+- The factory is a **singleton** (`shared`) in Swift
+- All Swift implementations must be **thread-safe**
+- After adding dependencies, rebuild: `./gradlew :common:embedAndSignAppleFrameworkForXcode`
+
 ## Additional Resources
 
 - [Kotlin Multiplatform Documentation](https://kotlinlang.org/docs/multiplatform.html)
