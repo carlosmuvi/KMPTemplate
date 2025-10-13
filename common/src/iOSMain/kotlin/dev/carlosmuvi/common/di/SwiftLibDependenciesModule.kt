@@ -1,35 +1,31 @@
 package dev.carlosmuvi.common.di
 
 import dev.carlosmuvi.common.model.AIModel
-import dev.carlosmuvi.common.platform.CalendarManager
+import dev.carlosmuvi.common.model.AIModels
 import dev.carlosmuvi.common.platform.PlatformInfo
 import org.koin.core.KoinApplication
-import org.koin.core.module.Module
-import org.koin.core.qualifier.named
+import org.koin.dsl.bind
 import org.koin.dsl.module
 
 /**
- * Creates a Koin module for Swift dependencies.
+ * Creates a Koin module for Swift-only dependencies.
  *
- * This module binds Swift-only implementations to their Kotlin interfaces,
+ * This module binds Swift implementations to their Kotlin interfaces,
  * making them injectable throughout the KMP codebase.
  *
  * @param factory The Swift implementation of SwiftLibDependencyFactory
  * @return A Koin module containing all Swift dependencies
  */
-internal fun swiftLibDependenciesModule(factory: SwiftLibDependencyFactory): Module = module {
-    // Platform information
-    single<PlatformInfo> { factory.providePlatformInfo() }
+internal fun swiftLibDependenciesModule(factory: SwiftLibDependencyFactory) = module {
+    // Platform information (uses UIKit APIs)
+    single { factory.providePlatformInfo() } bind PlatformInfo::class
 
-    // Calendar manager for EventKit integration
-    single<CalendarManager> { factory.provideCalendarManager() }
-
-    // List of available AI models
-    single<List<AIModel>>(named("aiModels")) { factory.provideAIModels() }
+    // List of available AI models (Swift-only implementations)
+    single { factory.provideAIModels() } bind AIModels::class
 }
 
 /**
- * Extension function to provide the Swift dependency factory to Koin.
+ * Extension function to provide Swift dependency factory to Koin.
  *
  * Usage in Swift:
  * ```swift

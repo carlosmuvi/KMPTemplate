@@ -41,3 +41,21 @@ interface AIModel {
      */
     suspend fun run(prompt: String): AIModelResponse
 }
+
+/**
+ * Wrapper class for AI models list to make dependency injection clearer
+ * and avoid conflicts with generic List<AIModel> types
+ */
+data class AIModels(
+    val models: List<AIModel>
+) {
+    /**
+     * Get a specific model by its ID
+     */
+    fun getById(modelId: String): AIModel? = models.find { it.id == modelId }
+
+    /**
+     * Get all available models
+     */
+    fun getAll(): List<AIModel> = models
+}

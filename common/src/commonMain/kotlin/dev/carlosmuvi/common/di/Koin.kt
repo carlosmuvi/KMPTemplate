@@ -1,31 +1,23 @@
 package dev.carlosmuvi.common.di
 
 import dev.carlosmuvi.common.model.AIModel
+import dev.carlosmuvi.common.model.AIModels
 import dev.carlosmuvi.common.platformModule
+import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 
-fun initKoin(
-    aiModels: List<AIModel>,
-    appDeclaration: KoinAppDeclaration = {}
-) =
+// iOS uses this - Swift factory will provide AI models module
+fun initKoin(onKoinStart: KoinApplication.() -> Unit): KoinApplication =
     startKoin {
-        appDeclaration()
-        modules(commonModule(aiModels))
+        onKoinStart()
+        modules(commonModule)
     }
 
-// called by iOS etc
-fun initKoin(aiModels: List<AIModel>) =
-    initKoin(aiModels, appDeclaration = {})
-
-fun commonModule(
-    aiModels: List<AIModel> = emptyList()
-) = module {
-    // Register the list of AI models
-    single { aiModels }
-
+val commonModule = module {
     includes(repositoryModule)
     includes(viewModelModule)
     includes(platformModule())
 }
+

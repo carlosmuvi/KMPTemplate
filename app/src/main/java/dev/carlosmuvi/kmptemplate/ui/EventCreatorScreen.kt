@@ -20,7 +20,7 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Title
-import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -44,7 +44,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.carlosmuvi.common.model.Event
 import dev.carlosmuvi.common.model.EventCreatorState
-import dev.carlosmuvi.common.model.ReminderTime
 import dev.carlosmuvi.common.viewmodel.EventCreatorViewModel
 import kotlinx.datetime.LocalDateTime
 import org.koin.androidx.compose.koinViewModel
@@ -72,53 +71,56 @@ fun EventCreatorScreen(
             modifier = Modifier.padding(top = 16.dp)
         )
 
-        Text(
-            text = "Enter event details and AI will extract the information",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        // Input Text Field
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        // Only show input form when no event is present
+        if (state.event == null) {
             Text(
-                text = "Event Details",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
+                text = "Enter event details and AI will extract the information",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            OutlinedTextField(
-                value = inputText,
-                onValueChange = {
-                    inputText = it
-                    viewModel.updateInputText(it)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp),
-                placeholder = { Text("e.g., Team meeting tomorrow at 2pm in the conference room") },
-                maxLines = 6
-            )
-        }
-
-        // Parse Button
-        Button(
-            onClick = { viewModel.parseEvent() },
-            enabled = inputText.isNotBlank() && !state.isLoading,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            if (state.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
+            // Input Text Field
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = "Event Details",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Parsing...")
-            } else {
-                Text("Parse Event")
+
+                OutlinedTextField(
+                    value = inputText,
+                    onValueChange = {
+                        inputText = it
+                        viewModel.updateInputText(it)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp),
+                    placeholder = { Text("e.g., Team meeting tomorrow at 2pm in the conference room") },
+                    maxLines = 6
+                )
+            }
+
+            // Parse Button
+            Button(
+                onClick = { viewModel.parseEvent() },
+                enabled = inputText.isNotBlank() && !state.isLoading,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (state.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Parsing...")
+                } else {
+                    Text("Parse Event")
+                }
             }
         }
 
@@ -140,26 +142,53 @@ fun EventCreatorScreen(
 
         // Event Display
         state.event?.let { event ->
-            EventCard(event = event)
-
-            Button(
-                onClick = { viewModel.confirmEvent() },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !state.isAddingToCalendar,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary
+            if (state.isEditMode) {
+                // Edit Mode
+                EventEditCard(
+                    event = event,
+                    viewModel = viewModel
                 )
-            ) {
-                if (state.isAddingToCalendar) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        strokeWidth = 2.dp
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Adding to Calendar...")
-                } else {
-                    Text("Add to Calendar")
+            } else {
+                // Display Mode
+                EventCard(event = event)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Button(
+                        onClick = { viewModel.enableEditMode() },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Edit")
+                    }
+
+                    Button(
+                        onClick = { viewModel.confirmEvent() },
+                        modifier = Modifier.weight(1f),
+                        enabled = !state.isAddingToCalendar,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.tertiary
+                        )
+                    ) {
+                        if (state.isAddingToCalendar) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                strokeWidth = 2.dp
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Adding...")
+                        } else {
+                            Text("Add to Calendar")
+                        }
+                    }
                 }
             }
         }
@@ -276,14 +305,6 @@ fun EventCard(event: Event) {
                 label = "End",
                 value = formatDateTime(event.endDateTime)
             )
-
-            if (event.allDay) {
-                EventDetailRow(
-                    icon = Icons.Default.WbSunny,
-                    label = "All Day",
-                    value = "Yes"
-                )
-            }
         }
     }
 }
@@ -379,14 +400,188 @@ private fun formatDateTime(dateTime: LocalDateTime): String {
     }"
 }
 
-private fun formatReminder(reminder: ReminderTime): String {
-    return when (reminder) {
-        ReminderTime.NONE -> "None"
-        ReminderTime.AT_TIME -> "At event time"
-        ReminderTime.FIVE_MINUTES -> "5 minutes before"
-        ReminderTime.FIFTEEN_MINUTES -> "15 minutes before"
-        ReminderTime.THIRTY_MINUTES -> "30 minutes before"
-        ReminderTime.ONE_HOUR -> "1 hour before"
-        ReminderTime.ONE_DAY -> "1 day before"
+@Composable
+fun EventEditCard(
+    event: Event,
+    viewModel: EventCreatorViewModel
+) {
+    var title by remember { mutableStateOf(event.title) }
+    var description by remember { mutableStateOf(event.description ?: "") }
+    var location by remember { mutableStateOf(event.location ?: "") }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Header
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = "Edit Event",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+            HorizontalDivider()
+
+            // Editable Fields
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Title
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = "Title",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    OutlinedTextField(
+                        value = title,
+                        onValueChange = {
+                            title = it
+                            viewModel.updateTitle(it)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text("Event title") }
+                    )
+                }
+
+                // Description
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = "Description",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    OutlinedTextField(
+                        value = description,
+                        onValueChange = {
+                            description = it
+                            viewModel.updateDescription(it)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                        placeholder = { Text("Event description") },
+                        maxLines = 4
+                    )
+                }
+
+                // Location
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = "Location",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    OutlinedTextField(
+                        value = location,
+                        onValueChange = {
+                            location = it
+                            viewModel.updateLocation(it)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text("Event location") }
+                    )
+                }
+
+                // Date/Time Display (not editable in this version)
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CalendarToday,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Text(
+                            text = "Start: ${formatDateTime(event.startDateTime)}",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CalendarToday,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Text(
+                            text = "End: ${formatDateTime(event.endDateTime)}",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    Text(
+                        text = "Date/time editing coming soon",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            HorizontalDivider()
+
+            // Action Buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Button(
+                    onClick = { viewModel.cancelEdit() },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                ) {
+                    Text("Cancel")
+                }
+
+                Button(
+                    onClick = { viewModel.saveEdits() },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Save")
+                }
+            }
+        }
     }
 }

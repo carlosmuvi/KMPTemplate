@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDateTime
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -62,6 +63,109 @@ class EventCreatorViewModel : ViewModel(), KoinComponent {
         _state.value = EventCreatorState.Idle
         _inputText.value = ""
     }
+
+    // ============ Edit Mode Functions ============
+
+    /**
+     * Enable edit mode
+     */
+    fun enableEditMode() {
+        _state.value = _state.value.copy(
+            isEditMode = true
+        )
+    }
+
+    /**
+     * Update the title in the event
+     */
+    fun updateTitle(newTitle: String) {
+        val event = _state.value.event ?: return
+        _state.value = _state.value.copy(
+            event = event.copy(title = newTitle)
+        )
+    }
+
+    /**
+     * Update the description in the event
+     */
+    fun updateDescription(newDescription: String) {
+        val event = _state.value.event ?: return
+        _state.value = _state.value.copy(
+            event = event.copy(description = newDescription.takeIf { it.isNotBlank() })
+        )
+    }
+
+    /**
+     * Update the location in the event
+     */
+    fun updateLocation(newLocation: String) {
+        val event = _state.value.event ?: return
+        _state.value = _state.value.copy(
+            event = event.copy(location = newLocation.takeIf { it.isNotBlank() })
+        )
+    }
+
+    /**
+     * Update the start date/time in the event
+     */
+    fun updateStartDateTime(newStartDateTime: LocalDateTime) {
+        val event = _state.value.event ?: return
+        _state.value = _state.value.copy(
+            event = event.copy(startDateTime = newStartDateTime)
+        )
+    }
+
+    /**
+     * Update the end date/time in the event
+     */
+    fun updateEndDateTime(newEndDateTime: LocalDateTime) {
+        val event = _state.value.event ?: return
+        _state.value = _state.value.copy(
+            event = event.copy(endDateTime = newEndDateTime)
+        )
+    }
+
+    /**
+     * Toggle the all-day flag in the event
+     */
+    fun toggleAllDay() {
+        val event = _state.value.event ?: return
+        _state.value = _state.value.copy(
+            event = event.copy(allDay = !event.allDay)
+        )
+    }
+
+    /**
+     * Cancel edit mode and revert to the original parsed event
+     */
+    fun cancelEdit() {
+        _state.value = _state.value.copy(
+            isEditMode = false
+        )
+    }
+
+    /**
+     * Save edits by exiting edit mode
+     */
+    fun saveEdits() {
+        val event = _state.value.event ?: return
+
+        // Validate
+        if (event.title.isBlank()) {
+            _state.value = _state.value.copy(
+                error = "Event title cannot be empty"
+            )
+            return
+        }
+
+        // Exit edit mode
+        _state.value = _state.value.copy(
+            isEditMode = false,
+            error = null
+        )
+    }
+
+    // ============ Confirm and Add to Calendar ============
 
     fun confirmEvent() {
         val event = _state.value.event ?: return

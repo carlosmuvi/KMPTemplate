@@ -1,7 +1,6 @@
 package dev.carlosmuvi.common.di
 
-import dev.carlosmuvi.common.model.AIModel
-import dev.carlosmuvi.common.platform.CalendarManager
+import dev.carlosmuvi.common.model.AIModels
 import dev.carlosmuvi.common.platform.PlatformInfo
 
 /**
@@ -31,12 +30,8 @@ interface SwiftLibDependencyFactory {
     fun providePlatformInfo(): PlatformInfo
 
     /**
-     * Provides calendar manager for iOS EventKit integration
+     * Provides available AI models (e.g., Apple Foundation Models)
+     * These are Swift-only implementations that use frameworks like FoundationModels
      */
-    fun provideCalendarManager(): CalendarManager
-
-    /**
-     * Provides list of available AI models (e.g., Apple Foundation Models)
-     */
-    fun provideAIModels(): List<AIModel>
+    fun provideAIModels(): AIModels
 }

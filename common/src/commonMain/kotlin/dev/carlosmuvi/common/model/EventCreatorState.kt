@@ -8,7 +8,8 @@ data class EventCreatorState(
     val event: Event? = null,
     val error: String? = null,
     val isAddingToCalendar: Boolean = false,
-    val successMessage: String? = null
+    val successMessage: String? = null,
+    val isEditMode: Boolean = false
 ) {
     companion object {
         val Idle = EventCreatorState()

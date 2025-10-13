@@ -67,6 +67,7 @@ kotlin {
 
         androidMain.dependencies {
             implementation(libs.androidx.compose.ui.tooling)
+            implementation(libs.generativeai)
         }
 
         iosMain.dependencies {

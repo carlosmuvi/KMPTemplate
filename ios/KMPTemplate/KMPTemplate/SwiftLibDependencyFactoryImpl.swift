@@ -6,7 +6,10 @@ import UIKit
  * Swift implementation of the dependency factory.
  *
  * This class provides Swift-only dependencies to the Kotlin Multiplatform shared code.
- * Add new Swift dependencies here as needed (e.g., Firebase, native analytics, etc.)
+ * Use this for Swift Package Manager dependencies or Swift-only frameworks.
+ *
+ * Note: CalendarManager is NOT here because it's implemented in Kotlin (iOSMain)
+ * and uses EventKit directly. It's provided via the iOS platformModule.
  */
 class SwiftLibDependencyFactoryImpl: SwiftLibDependencyFactory {
     static let shared = SwiftLibDependencyFactoryImpl()
@@ -17,13 +20,7 @@ class SwiftLibDependencyFactoryImpl: SwiftLibDependencyFactory {
         return PlatformInfoImpl()
     }
 
-    func provideCalendarManager() -> CalendarManager {
-        // CalendarManager is an actual class in Kotlin that uses EventKit
-        // We instantiate it directly since it's already iOS-specific
-        return CalendarManager()
-    }
-
-    func provideAIModels() -> [any AIModel] {
+    func provideAIModels() -> AIModels {
         var models: [any AIModel] = []
 
         // Add Apple Foundation Model if available (iOS 26+)
@@ -31,10 +28,10 @@ class SwiftLibDependencyFactoryImpl: SwiftLibDependencyFactory {
             models.append(AppleFoundationModel())
         }
 
-        // Add more AI models here as needed:
+        // Add more Swift-only AI models here as needed:
         // models.append(CustomModel())
 
-        return models
+        return AIModels(models: models)
     }
 }
 

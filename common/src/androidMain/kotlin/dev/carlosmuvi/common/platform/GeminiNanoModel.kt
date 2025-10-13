@@ -1,9 +1,8 @@
-package dev.carlosmuvi.kmptemplate.ai
+package dev.carlosmuvi.common.platform
 
-import android.content.Context
-import com.google.ai.edge.aicore.GenerativeModel
-import com.google.ai.edge.aicore.content
-import com.google.ai.edge.aicore.generationConfig
+import com.google.ai.client.generativeai.GenerativeModel
+import com.google.ai.client.generativeai.type.content
+import com.google.ai.client.generativeai.type.generationConfig
 import dev.carlosmuvi.common.model.AIInstructions
 import dev.carlosmuvi.common.model.AIModel
 import dev.carlosmuvi.common.model.AIModelResponse
@@ -15,9 +14,7 @@ import kotlinx.coroutines.withContext
  * Gemini Nano Model implementation for Android
  * Uses Google's on-device Gemini Nano model via AICore
  */
-class GeminiNanoModel(
-    private val context: Context
-) : AIModel {
+class GeminiNanoModel() : AIModel {
     override val id: String = "gemini-nano"
     override val name: String = "Gemini Nano"
     override val description: String = "Google's on-device foundation model for text generation"
@@ -25,14 +22,15 @@ class GeminiNanoModel(
     private val instructions = AIInstructions.eventExtraction
 
     private val generationConfig = generationConfig {
-        context = this@GeminiNanoModel.context
         temperature = 0.7f
         topK = 40
         maxOutputTokens = 1024
     }
 
     private val generativeModel = GenerativeModel(
-        generationConfig = generationConfig
+        generationConfig = generationConfig,
+        modelName = "",
+        apiKey = ""
     )
 
     override suspend fun run(prompt: String): AIModelResponse {

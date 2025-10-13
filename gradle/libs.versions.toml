@@ -39,6 +39,7 @@ okalgo = "0.0.2"
 kotlinStatistics = "1.2.1"
 mcp = "0.6.0"
 shadowPlugin = "9.1.0"
+generativeai = "0.9.0"
 
 
 [libraries]
@@ -105,6 +106,7 @@ mcp-kotlin = { group = "io.modelcontextprotocol", name = "kotlin-sdk", version.r
 
 # AI Libraries
 aicore = { group = "com.google.ai.edge.aicore", name = "aicore", version.ref = "aicore" }
+generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeai" }
 
 
 [bundles]
