@@ -49,3 +49,6 @@ Pods/
 
 # Log files
 *.log
+
+# Detekt
+build/reports/detekt/

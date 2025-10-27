@@ -36,6 +36,7 @@ okalgo = "0.0.2"
 kotlinStatistics = "1.2.1"
 mcp = "0.6.0"
 shadowPlugin = "9.1.0"
+detekt = "1.23.7"
 
 
 [libraries]
@@ -116,3 +117,4 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 screenshot = { id = "com.android.compose.screenshot", version.ref = "screenshot"}
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm" }
 shadowPlugin = { id = "com.gradleup.shadow", version.ref = "shadowPlugin" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
